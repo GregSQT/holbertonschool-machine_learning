@@ -7,7 +7,7 @@ Function used to performs matrix multiplication
 def mat_mul(mat1, mat2):
     """
     Input : 2 matrix
-    Return : a matrix issue frome the multiplication of the 2 matrix in parameter
+    Return : Multiplication of the 2 matrix as a new matrix
     """
     if len(mat1[0]) == len(mat2):
         result_matrix = []
