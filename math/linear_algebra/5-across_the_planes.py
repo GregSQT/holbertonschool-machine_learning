@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Function used to add arrays
+Function used to sum 2 arrays element wise
 """
 
 
