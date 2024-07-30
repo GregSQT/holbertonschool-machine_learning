@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Function used to calculate the shape of a matrix
-using numpy
+Function used to calculates the shape of a numpy.ndarray
 """
 
 
