@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Function used to element-wise 
+Function used to element-wise
 addition, subtraction, multiplication, and division
 """
 
