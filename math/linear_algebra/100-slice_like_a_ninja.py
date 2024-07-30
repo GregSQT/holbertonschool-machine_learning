@@ -11,10 +11,10 @@ def np_slice(matrix, axes={}):
     Return : The result of the slice
     """
     slice_result = []
-    for l in range(len(matrix.shape)):
+    for item_nb in range(len(matrix.shape)):
         flag = 0
         for ind, ax in axes.items():
-            if ind == l:
+            if ind == item_nb:
                 slice_result.append(slice(*ax))
                 flag = 1
                 break
