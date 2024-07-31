@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Function used to calculates the shape of a numpy.ndarray
+Function used to adds two matrices
 """
-
 
 def np_shape(matrix):
     """
@@ -10,3 +9,4 @@ def np_shape(matrix):
     Returns the shape of the matrix
     """
     return matrix.shape
+
