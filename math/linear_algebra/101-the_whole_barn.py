@@ -38,5 +38,5 @@ def add_matrices(mat1, mat2):
     if matrix_shape(mat1) != matrix_shape(mat2):
         return None
     else:
-        result_matrix = new_matrix(mat1, mat2)
-        return result_matrix
+        new_matrix = new_matrix(mat1, mat2)
+        return new_matrix
