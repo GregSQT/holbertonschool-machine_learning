@@ -34,8 +34,8 @@ def cat_matrices(mat1, mat2, axis=0):
     Input : 2 matrix
     Output : a concatenation of the 2 matrix along a specific axis
     """
-    if matrix_shape(mat1) != matrix_shape(mat2):
-        return None
-    else:
+    if len(matrix_shape(mat1)) > axis and len(matrix_shape(mat2)) > axis:
         new_matrix = elements_concatenate(mat1, mat2, axis)
         return new_matrix
+    else:
+        return None
