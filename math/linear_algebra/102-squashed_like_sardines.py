@@ -2,7 +2,6 @@
 """
 Function used to adds two matrices
 """
-import numpy as np
 
 
 def matrix_shape(matrix):
