@@ -9,7 +9,7 @@ def matrix_shape(matrix):
     Input : a matrix
     Returns the shape of the matrix
     """
-    if type(matrix[0]) != list:
+    if type(matrix[0]) is not list:
         return [len(matrix)]
     else:
         return [len(matrix)] + matrix_shape(matrix[0])
@@ -23,10 +23,10 @@ def elements_addition(mat1, mat2):
     new_matrix = []
     if (type(mat1) and type(mat2)) == list:
         for i in range(len(mat1)):
-            if type(mat1[i]) == list:
-                new_matrix.append(elements_addition(mat1[i], mat2[i]))
-            else:
+            if type(mat1[i]) is not list:
                 new_matrix.append(mat1[i] + mat2[i])
+            else:
+                new_matrix.append(elements_addition(mat1[i], mat2[i]))
         return new_matrix
 
 
