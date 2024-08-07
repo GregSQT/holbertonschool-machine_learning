@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
+"""
+Function used to plot x to y as a scatter plot
+"""
+
 
 def scatter():
+    """
+    Function without input
+    """
 
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]
