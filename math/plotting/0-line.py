@@ -9,6 +9,8 @@ Function used to draw a line
 def line():
     """
     No argument
+    Will draw a line from 0 to 10 on axis
+    the line will be a representation of cube of x
     """
 
     y = np.arange(0, 11) ** 3
