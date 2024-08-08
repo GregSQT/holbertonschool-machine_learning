@@ -3,6 +3,7 @@
 Function used to plot x and y as a line graph
 """
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 
