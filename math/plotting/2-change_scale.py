@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 Function without input
 """
 
+
 def change_scale():
     x = np.arange(0, 28651, 5730)
     r = np.log(0.5)
