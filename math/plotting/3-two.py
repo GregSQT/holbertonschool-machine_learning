@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 """
 Function without input
 """
-def two():
 
+
+def two():
     x = np.arange(0, 21000, 1000)
     r = np.log(0.5)
     t1 = 5730
