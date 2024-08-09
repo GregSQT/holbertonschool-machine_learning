@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Function used to plot x and y as a line graph
+Function used to plot x->y1 and x->y2 as a line graph
 """
 
 
