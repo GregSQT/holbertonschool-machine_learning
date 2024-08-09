@@ -28,7 +28,7 @@ def bars():
 
     for row in range(n_rows):
         plt.bar(index, fruit[row], bar_width, bottom=y_offset,
-        color=colors[row], label=rows[row])
+                color=colors[row], label=rows[row])
         y_offset = y_offset + fruit[row]
 
     plt.legend()
