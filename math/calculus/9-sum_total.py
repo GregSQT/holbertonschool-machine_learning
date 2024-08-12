@@ -9,7 +9,7 @@ def summation_i_squared(n):
     Input : n (limit)
     Output : sum of i^2 with i from 1 to n
     """
-    if n < 1 or type(n) != int:
+    if n < 1 or type(n) is not int:
         return None
     else:
         iterations = range(1, n + 1)
