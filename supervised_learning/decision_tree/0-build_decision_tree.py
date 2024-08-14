@@ -2,8 +2,11 @@
 
 import numpy as np
 
+
 class Node:
-    def __init__(self, feature=None, threshold=None, left_child=None, right_child=None, is_root=False, depth=0):
+    def __init__(self, feature=None, 
+            threshold=None, 
+            left_child=None, right_child=None, is_root=False, depth=0):
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -24,6 +27,7 @@ class Node:
                 return max(left_depth, right_depth)
         return max_depth_recursive(self, 0)
 
+
 class Leaf(Node):
     def __init__(self, value, depth=None):
         super().__init__()
@@ -33,6 +37,7 @@ class Leaf(Node):
 
     def max_depth_below(self) :
         return self.depth
+
 
 class Decision_Tree():
     def __init__(self, max_depth=10, min_pop=1, seed=0, split_criterion="random", root=None):
