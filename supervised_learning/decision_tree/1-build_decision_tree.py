@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-
-import numpy as np
-
 """
 Exercise 0-Depth of a decision tree
 """
+import numpy as np
 
 
 class Node:
@@ -28,13 +26,23 @@ class Node:
         Recursively calculate the depth of a decision tree
         """
         def max_depth_recursive(node, depth):
-            if node.is_leaf is True:
-                return depth
+            if self.is_leaf is True:
+                return self.depth
             else:
-                left_depth = max_depth_recursive(node.left_child, depth + 1)
-                right_depth = max_depth_recursive(node.right_child, depth + 1)
+                left_depth = self.left_child.max_depth_below()
+                right_depth = self.right_child.max_depth_below()
                 return max(left_depth, right_depth)
-        return max_depth_recursive(self, 0)
+
+        def count_nodes_below(self, only_leaves=False):
+        """
+        Counts the number of nodes in the tree.
+        """
+        if self.is_leaf:
+            return 1
+
+        lcount = self.left_child.count_nodes_below(only_leaves=only_leaves)
+        rcount = self.right_child.count_nodes_below(only_leaves=only_leaves)
+        return lcount + rcount + (not only_leaves)
 
 
 class Leaf(Node):
@@ -49,6 +57,9 @@ class Leaf(Node):
 
     def max_depth_below(self):
         return self.depth
+
+    def count_nodes_below(self, only_leaves=False) :
+    return 1
 
 
 class Decision_Tree():
@@ -71,3 +82,6 @@ class Decision_Tree():
 
     def depth(self):
         return self.root.max_depth_below()
+
+    def count_nodes(self, only_leaves=False) :
+        return self.root.count_nodes_below(only_leaves=only_leaves)
