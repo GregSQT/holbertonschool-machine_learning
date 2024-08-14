@@ -2,6 +2,10 @@
 
 import numpy as np
 
+"""
+Exercise 0-Depth of a decision tree
+"""
+
 
 class Node:
     """
