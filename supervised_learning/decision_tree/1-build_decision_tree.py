@@ -6,12 +6,13 @@ import numpy as np
 
 
 class Node:
-    """
-    Defines the classe Node
-    """
-    def __init__(self, feature=None,
-                 threshold=None,
-                 left_child=None, right_child=None, is_root=False, depth=0):
+    """ Defines a node of the decision tree. """
+
+    def __init__(self, feature=None, threshold=None, left_child=None,
+                 right_child=None, is_root=False, depth=0):
+        """
+        Class constructor for Node instances.
+        """
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -23,19 +24,18 @@ class Node:
 
     def max_depth_below(self):
         """
-        Recursively calculate the depth of a decision tree
+        Calculate the depth of a node
         """
-        def max_depth_recursive(node, depth):
-            if self.is_leaf is True:
-                return self.depth
-            else:
-                left_depth = self.left_child.max_depth_below()
-                right_depth = self.right_child.max_depth_below()
-                return max(left_depth, right_depth)
+        if self.is_leaf:
+            return self.depth
 
-        def count_nodes_below(self, only_leaves=False):
+        left_depth = self.left_child.max_depth_below()
+        right_depth = self.right_child.max_depth_below()
+        return max(left_depth, right_depth)
+
+    def count_nodes_below(self, only_leaves=False):
         """
-        Counts the number of nodes in the tree.
+        Calculate the number of nodes in the tree.
         """
         if self.is_leaf:
             return 1
@@ -58,8 +58,8 @@ class Leaf(Node):
     def max_depth_below(self):
         return self.depth
 
-    def count_nodes_below(self, only_leaves=False) :
-    return 1
+    def count_nodes_below(self, only_leaves=False):
+        return 1
 
 
 class Decision_Tree():
