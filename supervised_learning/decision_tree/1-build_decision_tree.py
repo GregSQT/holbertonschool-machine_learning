@@ -83,5 +83,5 @@ class Decision_Tree():
     def depth(self):
         return self.root.max_depth_below()
 
-    def count_nodes(self, only_leaves=False) :
+    def count_nodes(self, only_leaves=False):
         return self.root.count_nodes_below(only_leaves=only_leaves)
