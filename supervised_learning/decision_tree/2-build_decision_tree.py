@@ -122,7 +122,7 @@ class Decision_Tree():
         return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
-        """ Returns the number of nodes is the tree. 
+        """ Returns the number of nodes is the tree
         If only_leaves is True, excludes the root and internal nodes
         """
         return self.root.count_nodes_below(only_leaves=only_leaves)
