@@ -70,6 +70,12 @@ class Node:
             + self.left_child_add_prefix(str(self.left_child))\
             + self.right_child_add_prefix(str(self.right_child))
 
+    def get_leaves_below(self):
+        """ Returns the list of leaves below the current Node instance """
+        left_leaves = self.left_child.get_leaves_below()
+        right_leaves = self.right_child.get_leaves_below()
+        return left_leaves + right_leaves
+
 
 class Leaf(Node):
     """
@@ -95,6 +101,10 @@ class Leaf(Node):
     def __str__(self):
         """ Defines the printing format for a Leaf instance """
         return (f"-> leaf [value={self.value}]")
+
+    def get_leaves_below(self):
+        """ Returns the current Leaf instance in a list """
+        return [self]
 
 
 class Decision_Tree():
@@ -130,3 +140,7 @@ class Decision_Tree():
     def __str__(self):
         """ Defines the printing format for a Decision_Tree instance """
         return self.root.__str__()+"\n"
+
+    def get_leaves(self):
+        """ Returns the list of all the leaves in the decision tree """
+        return self.root.get_leaves_below()
