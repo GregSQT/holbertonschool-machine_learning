@@ -116,7 +116,8 @@ class Node:
 
     def pred(self, A):
         """
-        Returns the recursively computed prediction outcome for the current node
+        Returns the recursively computed prediction outcome
+        for the current node
         """
         if A[self.feature] > self.threshold:
             return self.left_child.pred(A)
@@ -156,6 +157,7 @@ class Leaf(Node):
     def update_bounds_below(self):
         """ Does nothing since there are no nodes below a leaf """
         pass
+
     def pred(self, x):
         """ Returns the predicted value for the current Leaf instance """
         return self.value
