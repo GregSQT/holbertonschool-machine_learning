@@ -148,6 +148,7 @@ class Leaf(Node):
         """ Does nothing since there are no nodes below a leaf """
         pass
 
+
 class Decision_Tree():
     """ Defines the decision tree """
 
