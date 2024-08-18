@@ -301,13 +301,13 @@ class Decision_Tree():
             self.fit_node(node.right_child)
 
         def get_leaf_child(self, node, sub_population):
-        """ Creates a leaf child node for the decision tree with the specified
-        sub-population. """
-        value = np.bincount(self.target[sub_population]).argmax()
-        leaf_child = Leaf(value)
-        leaf_child.depth = node.depth+1
-        leaf_child.sub_population = sub_population
-        return leaf_child
+            """ Creates a leaf child node for the decision tree with the specified
+            sub-population. """
+            value = np.bincount(self.target[sub_population]).argmax()
+            leaf_child = Leaf(value)
+            leaf_child.depth = node.depth+1
+            leaf_child.sub_population = sub_population
+            return leaf_child
 
     def get_node_child(self, node, sub_population):
         """ Creates a new node child for the decision tree with the specified
