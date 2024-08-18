@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exercise 8. Using Gini impurity function as a splitting criterion
+Exercise 9. Random forests
 """
 import numpy as np
 
