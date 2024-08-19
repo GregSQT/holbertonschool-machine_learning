@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Exercise 3. Towards the predict function (1) : the get_leaves method
-"""
+""" Node, Leaf, and Decision_Tree classes """
 import numpy as np
 
 
