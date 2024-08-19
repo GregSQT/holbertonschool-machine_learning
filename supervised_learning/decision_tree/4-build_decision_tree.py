@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" 
+"""
 Exercice 4. Towards the predict function (2) : the update_bounds method
 """
 import numpy as np
