@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Exercice 0. Neuron
+"""
 
 import numpy as np
 
@@ -8,12 +11,10 @@ class Neuron:
     def __init__(self, nx):
         """
         Constructor method for Neuron instances.
-
         Args:
             nx : Number of input features to the neuron
                 Must be an integer
                 Must be positive
-
         Errors:
             TypeError: If nx is not an integer.
             ValueError: If nx less than 1.
