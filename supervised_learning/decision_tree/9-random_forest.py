@@ -77,6 +77,7 @@ class Node:
         return left_leaves + right_leaves
 
     def update_bounds_below(self):
+        """ Calculate the number of nodes in the tree. """
         if self.is_root:
             self.upper = {0: np.inf}
             self.lower = {0: -1*np.inf}
@@ -100,13 +101,15 @@ class Node:
             child.update_bounds_below()
 
     def update_indicator(self):
-
+        """ Updates indicators"""
         def is_large_enough(A):
+            """ Check if large enough """
             return np.all(
                 np.array([np.greater(A[:, feature], self.lower[feature])
                           for feature in self.lower]), axis=0)
 
         def is_small_enough(A):
+            """ Check if small enough """
             return np.all(
                 np.array([np.less_equal(A[:, feature], self.upper[feature])
                           for feature in self.upper]), axis=0)
