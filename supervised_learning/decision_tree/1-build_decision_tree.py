@@ -62,6 +62,9 @@ class Leaf(Node):
         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
+        """
+        Returns 1 if leaf
+        """
         return 1
 
 
