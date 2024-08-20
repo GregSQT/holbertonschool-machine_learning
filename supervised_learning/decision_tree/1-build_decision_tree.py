@@ -63,7 +63,7 @@ class Leaf(Node):
 
     def count_nodes_below(self, only_leaves=False):
         """
-        Returns 1 if leaf
+        Returns 1 if current node is a leaf
         """
         return 1
 
