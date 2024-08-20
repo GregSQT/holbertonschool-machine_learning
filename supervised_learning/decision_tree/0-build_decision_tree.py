@@ -35,6 +35,9 @@ class Node:
         Input : self
         """
         def max_depth_recursive(node, depth):
+            """
+            Recursively dig into the tree to get the depth
+            """
             if node.is_leaf is True:
                 return depth
             else:
