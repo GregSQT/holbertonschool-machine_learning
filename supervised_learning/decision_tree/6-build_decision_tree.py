@@ -147,6 +147,7 @@ class Leaf(Node):
         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
+        """ Calculate the number of nodes in the tree. """
         return 1
 
     def __str__(self):
