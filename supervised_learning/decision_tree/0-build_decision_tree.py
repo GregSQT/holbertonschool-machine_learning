@@ -7,8 +7,16 @@ import numpy as np
 
 class Node:
     """
-    Defines the classe Node
-    """
+        Class constructor for Node instances.
+
+        Args:
+            feature (int, optional): _description_. Defaults to None.
+            threshold (float, optional): _description_. Defaults to None.
+            left_child (Node, optional): _description_. Defaults to None.
+            right_child (Node, optional): _description_. Defaults to None.
+            is_root (bool, optional): _description_. Defaults to False.
+            depth (int, optional): _description_. Defaults to 0.
+        """
     def __init__(self, feature=None,
                  threshold=None,
                  left_child=None, right_child=None, is_root=False, depth=0):
@@ -24,6 +32,7 @@ class Node:
     def max_depth_below(self):
         """
         Recursively calculate the depth of a decision tree
+        Input : self
         """
         def max_depth_recursive(node, depth):
             if node.is_leaf is True:
