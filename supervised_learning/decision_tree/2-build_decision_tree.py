@@ -34,9 +34,7 @@ class Node:
         return max(left_depth, right_depth)
 
     def count_nodes_below(self, only_leaves=False):
-        """
-        Calculate the number of nodes in the tree.
-        """
+        """ Calculate the number of nodes in the tree. """
         if self.is_leaf:
             return 1
 
@@ -90,6 +88,7 @@ class Leaf(Node):
         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
+        """ Calculate the number of nodes in the tree. """
         return 1
 
     def __str__(self):
