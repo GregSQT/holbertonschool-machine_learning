@@ -77,6 +77,7 @@ class Node:
         return left_leaves + right_leaves
 
     def update_bounds_below(self):
+        """ updates the bounds below """
         if self.is_root:
             self.upper = {0: np.inf}
             self.lower = {0: -1*np.inf}
