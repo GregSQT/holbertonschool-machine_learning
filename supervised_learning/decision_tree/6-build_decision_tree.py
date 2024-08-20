@@ -100,13 +100,15 @@ class Node:
             child.update_bounds_below()
 
     def update_indicator(self):
-
+        """ Updates indicators"""
         def is_large_enough(A):
+            """ Check if large enough """
             return np.all(
                 np.array([np.greater(A[:, feature], self.lower[feature])
                           for feature in self.lower]), axis=0)
 
         def is_small_enough(A):
+            """ Check if small enough """
             return np.all(
                 np.array([np.less_equal(A[:, feature], self.upper[feature])
                           for feature in self.upper]), axis=0)
