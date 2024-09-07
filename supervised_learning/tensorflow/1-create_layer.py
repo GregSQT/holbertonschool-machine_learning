@@ -10,9 +10,9 @@ def create_layer(prev, n, activation):
     Create a layer in a neural network.
 
     Arguments:
-    prev -- tensor output of the previous layer
-    n -- number of nodes in the layer to create
-    activation -- activation function to be used
+    prev : tensor output of the previous layer
+    n : number of nodes in the layer to create
+    activation : activation function to be used
 
     Returns:
     Tensor output of the layer
