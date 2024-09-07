@@ -7,14 +7,14 @@ import tensorflow.compat.v1 as tf
 
 def create_placeholders(nx, classes):
     """
-    Creates placeholders for input data and labels.
+    Creates placeholders for input datas and labels.
 
     Arguments:
-    nx -- number of feature columns in the data
+    nx -- number of featured columns in the datas
     classes -- number of classes in the classifier
 
     Returns:
-    x : placeholder for input data
+    x : placeholder for input datas
     y : placeholder for one-hot labels
     """
     x = tf.placeholder(tf.float32, shape=(None, nx), name='x')
