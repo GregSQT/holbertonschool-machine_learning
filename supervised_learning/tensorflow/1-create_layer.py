@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exercice 1 - Layers
+Exercice 1 : Layers
 """
 import tensorflow.compat.v1 as tf
 
