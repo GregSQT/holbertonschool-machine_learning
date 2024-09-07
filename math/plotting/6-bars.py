@@ -2,18 +2,14 @@
 """
 Function used to plot a stacked bar graph
 """
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-"""
-Function without input
-"""
-
-
 def bars():
+    """
+    Function without input
+    """
     np.random.seed(5)
     fruit = np.random.randint(0, 20, (4, 3))
     plt.figure(figsize=(6.4, 4.8))
@@ -25,7 +21,7 @@ def bars():
     n_rows = len(fruit)
     bar_width = 0.5
     y_offset = np.zeros(len(columns))
-
+    
     for row in range(n_rows):
         plt.bar(index, fruit[row], bar_width, bottom=y_offset,
                 color=colors[row], label=rows[row])

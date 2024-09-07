@@ -2,18 +2,14 @@
 """
 Function used to plot x->y1 and x->y2 as a line graph
 """
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-"""
-Function without input
-"""
-
-
 def two():
+    """
+    Function without input
+    """
     x = np.arange(0, 21000, 1000)
     r = np.log(0.5)
     t1 = 5730
@@ -21,7 +17,6 @@ def two():
     y1 = np.exp((r / t1) * x)
     y2 = np.exp((r / t2) * x)
     plt.figure(figsize=(6.4, 4.8))
-
     plt.title('Exponential Decay of Radioactive Elements')
     plt.xlabel('Time (years)')
     plt.ylabel('Fraction Remaining')
