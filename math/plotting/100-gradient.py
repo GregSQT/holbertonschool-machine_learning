@@ -54,3 +54,4 @@ def gradient():
 
     # Display the plot
     plt.show()
+    
