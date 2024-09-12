@@ -2,7 +2,7 @@
 """
 Exercice 10 : Adam Upgraded
 """
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 
 def create_Adam_op(loss, alpha, beta1, beta2, epsilon):
