@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exercice 3 : Mini-Batch
+Exercice 3 : Trains a loaded neural network model using mini-batch gradient descent
 """
 import tensorflow as tf
 
@@ -12,88 +12,77 @@ def train_mini_batch(X_train, Y_train, X_valid, Y_valid, batch_size=32,
                      epochs=5, load_path="/tmp/model.ckpt",
                      save_path="/tmp/model.ckpt"):
     """
-    Trains a loaded neural network model using mini-batch gradient descent.
-
-    Args:
-        X_train: numpy.ndarray of shape (m, 784) containing the training data
-        Y_train: one-hot numpy.ndarray of shape (m, 10) containing training
-        X_valid: numpy.ndarray of shape (m, 784) containing the validation data
-        Y_valid: one-hot numpy.ndarray of shape (m, 10) containing validation
-        batch_size: number of data points in a batch
-        epochs: number of times the training should pass through whole dataset
-        load_path: path from which to load the model
-        save_path: path to where the model should be saved after training
-
-    Returns:
-        The path where the model was saved.
+    a function that trains a loaded neural network model using mini-batch
+    gradient descent
+    :param X_train: np.ndarray of shape (m, 784) containing the training data
+        m is the number of data points
+        784 is the number of input features
+    :param Y_train: one-hot numpy.ndarray of shape (m, 10) containing the
+    training labels
+        10 is the number of classes the model should classify
+    :param X_valid: np.ndarray of shape (m, 784) containing the validation data
+    :param Y_valid: one-hot np.ndarray of shape (m, 10) containing the
+    validation labels
+    :param batch_size: number of data points in a batch
+    :param epochs: number of times the training should pass through the whole
+    dataset
+    :param load_path: path from which to load the model
+    :param save_path: path to where the model should be saved after training
+    :return: path where the model was saved
     """
-
     with tf.Session() as sess:
-        # Restore the saved model
-        loader = tf.train.import_meta_graph(load_path + '.meta')
-        loader.restore(sess, load_path)
+        saver = tf.train.import_meta_graph(load_path + ".meta")
+        saver.restore(sess, load_path)
 
-        # Get the necessary variables from the saved model
-        var_names = ['x', 'y', 'accuracy', 'loss', 'train_op', 'y_pred']
-        for var_name in var_names:
-            globals()[var_name] = tf.get_collection(var_name)[0]
+        x = tf.get_collection("x")[0]
+        y = tf.get_collection("y")[0]
+        accuracy = tf.get_collection("accuracy")[0]
+        loss = tf.get_collection("loss")[0]
+        train_op = tf.get_collection("train_op")[0]
 
-        # Iterate through the specified number of epochs
-        for epoch in range(epochs + 1):
+        m = X_train.shape[0]
+        # mini batch definition
+        if m % batch_size == 0:
+            n_batches = m // batch_size
+        else:
+            n_batches = m // batch_size + 1
 
-            # Evaluate the model on training and validation data
-            loss_t = sess.run(loss, feed_dict={x: X_train, y: Y_train})
-            acc_t = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
-            loss_v = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
-            acc_v = sess.run(accuracy, feed_dict={x: X_valid, y: Y_valid})
+        # training loop
+        for i in range(epochs + 1):
+            cost_train = sess.run(loss, feed_dict={x: X_train, y: Y_train})
+            accuracy_train = sess.run(accuracy,
+                                      feed_dict={x: X_train, y: Y_train})
+            cost_val = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
+            accuracy_val = sess.run(accuracy,
+                                    feed_dict={x: X_valid, y: Y_valid})
+            print("After {} epochs:".format(i))
+            print("\tTraining Cost: {}".format(cost_train))
+            print("\tTraining Accuracy: {}".format(accuracy_train))
+            print("\tValidation Cost: {}".format(cost_val))
+            print("\tValidation Accuracy: {}".format(accuracy_val))
 
-            print("After {} epochs:".format(epoch))
-            print("\tTraining Cost: {}".format(loss_t))
-            print("\tTraining Accuracy: {}".format(acc_t))
-            print("\tValidation Cost: {}".format(loss_v))
-            print("\tValidation Accuracy: {}".format(acc_v))
+            if i < epochs:
+                shuffled_X, shuffled_Y = shuffle_data(X_train, Y_train)
 
-            if epoch < epochs:
-                # Shuffle the full data set before each new epoch
-                X_shuff, Y_shuff = shuffle_data(X_train, Y_train)
+                # mini batches
+                for b in range(n_batches):
+                    start = b * batch_size
+                    end = (b + 1) * batch_size
+                    if end > m:
+                        end = m
+                    X_mini_batch = shuffled_X[start:end]
+                    Y_mini_batch = shuffled_Y[start:end]
 
-                # Define the iteration range for gradient descent
-                batches_float = X_train.shape[0] / batch_size
-                batches_int = int(X_train.shape[0] / batch_size)
+                    next_train = {x: X_mini_batch, y: Y_mini_batch}
+                    sess.run(train_op, feed_dict=next_train)
 
-                # Gradient descent step
-                step = 0  # Reinitialize step to 0 between epochs
+                    if (b + 1) % 100 == 0 and b != 0:
+                        loss_mini_batch = sess.run(loss, feed_dict=next_train)
+                        acc_mini_batch = sess.run(accuracy,
+                                                  feed_dict=next_train)
+                        print("\tStep {}:".format(b + 1))
+                        print("\t\tCost: {}".format(loss_mini_batch))
+                        print("\t\tAccuracy: {}".format(acc_mini_batch))
 
-                for i in range(0, batches_int + 1):
-                    step += 1
-
-                    # Important: Make copies of X_shuff and Y_shuff
-                    if i == batches_int:
-                        if batches_float > batches_int:
-                            X_batch = X_shuff[i * batch_size:]
-                            Y_batch = Y_shuff[i * batch_size:]
-                        else:
-                            break
-                    else:
-                        X_batch = X_shuff[i * batch_size: (i + 1) * batch_size]
-                        Y_batch = Y_shuff[i * batch_size: (i + 1) * batch_size]
-
-                    # Pass the copies to feed_dict / train_op
-                    sess.run(train_op, feed_dict={x: X_batch, y: Y_batch})
-
-                    # Print after every 100 gradient descent steps
-                    if step % 100 == 0:
-                        loss_b = sess.run(
-                            loss, feed_dict={
-                                x: X_batch, y: Y_batch})
-                        acc_b = sess.run(
-                            accuracy, feed_dict={
-                                x: X_batch, y: Y_batch})
-                        print("\tStep {}:".format(step))
-                        print("\t\tCost: {}".format(loss_b))
-                        print("\t\tAccuracy: {}".format(acc_b))
-
-        # Save the trained model
-        save_path = loader.save(sess, save_path)
-
-    return save_path
+        return saver.save(sess, save_path)
+    
