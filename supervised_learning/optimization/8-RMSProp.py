@@ -5,22 +5,20 @@ Exercice 8 : RMSProp Upgraded
 import tensorflow as tf
 
 
-def create_RMSProp_op(loss, alpha, beta2, epsilon):
+def create_RMSProp_op(alpha, beta2, epsilon):
     """
-    Create the RMSProp optimization operation in TensorFlow.
+    Sets up the RMSProp optimization algorithm in TensorFlow.
 
     Args:
-        loss: Loss of the network.
-        alpha: Learning rate.
-        beta2: RMSProp weight.
-        epsilon: Small number to avoid division by zero.
+        alpha (float): The learning rate.
+        beta2 (float): The RMSProp weight (Discounting factor).
+        epsilon (float): A small number to avoid division by zero.
 
     Returns:
-        RMSProp optimization operation.
+        optimizer: Optimizer object for RMSProp.
     """
-    optimizer = tf.train.RMSPropOptimizer(
-        learning_rate=alpha, decay=beta2, momentum=0.0, epsilon=epsilon,
-        use_locking=False, centered=False, name='RMSProp'
-    )
-    train_op = optimizer.minimize(loss)
-    return train_op
+    optimizer = tf.keras.optimizers.RMSprop(
+        learning_rate=alpha,
+        rho=beta2,
+        epsilon=epsilon)
+    return optimizer
