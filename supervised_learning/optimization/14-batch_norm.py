@@ -7,73 +7,35 @@ import tensorflow as tf
 
 def create_batch_norm_layer(prev, n, activation):
     """
-    Create a batch normalization layer for a neural network in TensorFlow.
+    Creates a batch normalization layer for a neural network in TensorFlow.
 
     Args:
-        prev: The activated output of the previous layer.
-        n: The number of nodes in the layer to be created.
-        activation: The activation function to be used
-        on the output of the layer.
+        prev (tensor): The activated output of the previous layer.
+        n (int): The number of nodes in the layer to be created.
+        activation (function): The activation function
+            that should be used on the output of the layer.
 
     Returns:
-        A tensor of the activated output for the layer.
+        tensor: A tensor of the activated output for the layer.
     """
+    initializer = tf.keras.initializers.VarianceScaling(mode='fan_avg')
 
-    # Initialize the layer with the variance scaling initializer
-    initializer = tf.contrib.layers.variance_scaling_initializer(
-        mode="FAN_AVG")
-
-    # Create a dense layer with the specified number of units, no activation
-    # function
-    layer = tf.layers.Dense(
+    # Base layer with Dense
+    layer = tf.keras.layers.Dense(
         units=n,
-        activation=None,
         kernel_initializer=initializer,
-        name='layer')
+        use_bias=False)
+    x = layer(prev)
 
-    # Pass the previous layer through the dense layer to obtain the layer
-    # output
-    layer_output = layer(prev)
+    # Batch normalization
+    gamma = tf.Variable(tf.ones((n,)))
+    beta = tf.Variable(tf.zeros((n,)))
+    mean, variance = tf.nn.moments(x, axes=[0])
+    epsilon = 1e-7
+    x_normalized = (x - mean) / tf.sqrt(variance + epsilon)
+    x_scaled = gamma * x_normalized + beta
 
-    # Calculate the mean and variance of the layer output
-    mean, variance = tf.nn.moments(layer_output, axes=[0])
+    # Activation
+    activated_output = activation(x_scaled)
 
-    # Create trainable variables for beta and gamma, initialized as vectors of
-    # zeros and ones.
-    beta = tf.Variable(
-        tf.zeros(
-            shape=(
-                1,
-                n),
-            dtype=tf.float32),
-        trainable=True,
-        name='beta')
-    gamma = tf.Variable(
-        tf.ones(
-            shape=(
-                1,
-                n),
-            dtype=tf.float32),
-        trainable=True,
-        name='gamma')
-
-    # Set a small constant epsilon for numerical stability
-    epsilon = 1e-08
-
-    # Apply batch normalization to the layer output using the calculated mean,
-    # variance, beta, gamma, and epsilon
-    Z_b_norm = tf.nn.batch_normalization(
-        x=layer_output,
-        mean=mean,
-        variance=variance,
-        offset=beta,
-        scale=gamma,
-        variance_epsilon=epsilon,
-        name=None)
-
-    # Apply the specified activation function if provided
-    if activation:
-        return activation(Z_b_norm)
-
-    # Return the batch-normalized output if no activation function is provided
-    return Z_b_norm
+    return activated_output
