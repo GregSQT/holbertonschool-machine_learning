@@ -2,82 +2,40 @@
 """
 Exercice 3 : Trains a loaded neural network model using mini-batch gradient descent
 """
-import tensorflow.compat.v1 as tf
+import numpy as np
 
 
 shuffle_data = __import__('2-shuffle_data').shuffle_data
 
+def create_mini_batches(X, Y, batch_size):
+    '''
+    Creates mini-batches to be used for training
+    a neural network using mini-batch gradient descent.
+    '''
+    m = X.shape[0]
+    mini_batches = []
 
-def train_mini_batch(X_train, Y_train, X_valid, Y_valid, batch_size=32,
-                     epochs=5, load_path="/tmp/model.ckpt",
-                     save_path="/tmp/model.ckpt"):
-    """
-    Trains a loaded neural network model using mini-batch gradient descent.
+    # Shuffle the data
+    X_shuffled, Y_shuffled = shuffle_data(X, Y)
 
-    Args:
-        X_train (ndarray): Matrix of shape (m, 784), the training data.
-        Y_train (ndarray): Matrix of shape (m, 10), the training labels.
-        X_valid (ndarray): Matrix of shape (m, 784), the validation data.
-        Y_valid (ndarray): Matrix of shape (m, 10), validation labels.
-        batch_size (int): The number of data points in batch.
-        epochs (int): The number of times the training should pass through
-            the whole dataset.
-        load_path (str): The path from which to load the model.
-        save_path (str): The path to where the model should be saved
-            after training.
+    # Calculate the number of batches
+    num_batches = m // batch_size
 
-    Returns:
-        The path where the model was saved.
-    """
-    with tf.Session() as sess:
-        new_saver = tf.train.import_meta_graph(load_path + ".meta")
-        new_saver.restore(sess, load_path)
+    for i in range(num_batches):
+        start_idx = i * batch_size
+        end_idx = start_idx + batch_size
 
-        x = tf.get_collection('x')[0]
-        y = tf.get_collection('y')[0]
-        accuracy = tf.get_collection('accuracy')[0]
-        loss = tf.get_collection('loss')[0]
-        train_op = tf.get_collection('train_op')[0]
+        X_batch = X_shuffled[start_idx:end_idx]
+        Y_batch = Y_shuffled[start_idx:end_idx]
 
-        m = X_train.shape[0]
+        mini_batches.append((X_batch, Y_batch))
 
-        for epoch in range(epochs + 1):
-            train_cost, train_accuracy = sess.run(
-                [loss, accuracy], feed_dict={x: X_train, y: Y_train})
+    # Handle the last batch
+    # (if the total number of data points is not divisible by batch_size)
+    if m % batch_size != 0:
+        start_idx = num_batches * batch_size
+        X_batch = X_shuffled[start_idx:]
+        Y_batch = Y_shuffled[start_idx:]
+        mini_batches.append((X_batch, Y_batch))
 
-            valid_cost, valid_accuracy = sess.run(
-                [loss, accuracy], feed_dict={x: X_valid, y: Y_valid})
-
-            print("After {} epochs:".format(epoch))
-            print("\tTraining Cost: {}".format(train_cost))
-            print("\tTraining Accuracy: {}".format(train_accuracy))
-            print("\tValidation Cost: {}".format(valid_cost))
-            print("\tValidation Accuracy: {}".format(valid_accuracy))
-
-            if epoch < epochs:
-                X_train_shuffled, Y_train_shuffled = \
-                    shuffle_data(X_train, Y_train)
-
-                nbr_batch = m // batch_size + (m % batch_size != 0)
-
-                for step_number in range(nbr_batch):
-                    first_index = step_number * batch_size
-                    last_index = min(first_index + batch_size, m)
-
-                    x_batch = X_train_shuffled[first_index: last_index]
-                    y_batch = Y_train_shuffled[first_index: last_index]
-
-                    sess.run(train_op, feed_dict={x: x_batch, y: y_batch})
-
-                    if step_number > 0 and (step_number + 1) % 100 == 0:
-                        step_cost, step_accuracy = sess.run(
-                            [loss, accuracy],
-                            feed_dict={x: x_batch, y: y_batch})
-
-                        print("\tStep {}:".format(step_number + 1))
-                        print("\t\tCost: {}".format(step_cost))
-                        print("\t\tAccuracy: {}".format(step_accuracy))
-
-        saved_model = new_saver.save(sess, save_path)
-        return saved_model
-    
+    return mini_batches
