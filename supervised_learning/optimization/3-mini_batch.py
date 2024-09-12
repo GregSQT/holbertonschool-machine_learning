@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exercice 3 : Trains a loaded neural network model 
+Exercice 3 : Trains a loaded neural network model
              using mini-batch gradient descent
 """
 import numpy as np
