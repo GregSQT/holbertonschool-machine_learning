@@ -51,4 +51,3 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
         l2 = (1 - alpha * lambtha / m)
         weights['W' + str(i)] = l2 * weights_copy['W' + str(i)] - alpha * dWi
         weights['b' + str(i)] = weights_copy['b' + str(i)] - alpha * dbi
-        
