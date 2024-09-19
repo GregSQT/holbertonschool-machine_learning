@@ -16,7 +16,4 @@ def l2_reg_cost(cost):
     Returns:
     - TensorFlow scalar representing the cost with L2 regularization.
     """
-
-    # Get the regularization losses
-    """function that calculates the cost of a nn with L2 regularization"""
     return cost + tf.losses.get_regularization_losses()
