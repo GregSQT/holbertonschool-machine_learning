@@ -34,4 +34,3 @@ def f1_score(confusion):
 
     return f1
     # Return the calculated F1 score
-    
