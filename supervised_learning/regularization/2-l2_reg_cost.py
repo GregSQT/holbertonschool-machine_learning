@@ -7,13 +7,14 @@ import tensorflow as tf
 
 def l2_reg_cost(cost):
     """
-    Function that calculates the cost of a neural network
-    with L2 regularization.
+        Function that calculate the cost of NN with L2 regularization
 
-    Arguments:
-    - cost: TensorFlowscalar representing original cost without regularization
+        :param cost: tensor containing cost without L2 regularization
 
-    Returns:
-    - TensorFlow scalar representing the cost with L2 regularization.
+        :return: tensor cost WITH L2 regularization
     """
-    return cost + tf.losses.get_regularization_losses()
+    regularization_L2 = tf.compat.v1.losses.get_regularization_losses()
+
+    cost_L2reg = cost + regularization_L2
+
+    return cost_L2reg
