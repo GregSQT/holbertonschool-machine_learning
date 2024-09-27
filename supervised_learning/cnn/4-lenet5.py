@@ -2,7 +2,7 @@
 """
 Exercice 4 : LeNet-5 in Tensorflow
 """
-import tensorflow.compat.v1 as tf # Importing the tensorflow module for deep learning
+import tensorflow.compat.v1 as tf
 
 
 def lenet5(x, y):
