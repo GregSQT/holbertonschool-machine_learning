@@ -2,7 +2,6 @@
 """
 Exercice 4 : LeNet-5 in Tensorflow
 """
-# Description of the purpose of the code
 import tensorflow.compat.v1 as tf # Importing the tensorflow module for deep learning
 
 
