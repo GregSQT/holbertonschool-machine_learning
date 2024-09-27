@@ -3,7 +3,7 @@
 Exercice 4 : LeNet-5 in Tensorflow
 """
 # Description of the purpose of the code
-import tensorflow as tf  # Importing the tensorflow module for deep learning
+import tensorflow.compat.v1 as tf # Importing the tensorflow module for deep learning
 
 
 def lenet5(x, y):
