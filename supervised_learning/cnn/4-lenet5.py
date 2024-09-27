@@ -6,75 +6,58 @@ import tensorflow.compat.v1 as tf # Importing the tensorflow module for deep lea
 
 
 def lenet5(x, y):
-    """function that builds a modified version of LeNet-5"""
-    # Function definition with input parameters and docstring
+    """
+    a function that builds a modified LeNet-5 using tensorflow
+    :param x: tf.placeholder of shape (m, 28, 28, 1) containing the input
+    images for the network
+        m is the number of images
+    :param y: tf.placeholder of shape (m, 10) containing the one-hot labels
+    for the network
+    :return:
+        a tensor for the softmax activated output
+        a training operation that utilizes Adam optimization (with default
+        hyperparameters)
+        a tensor for the loss of the network
+        a tensor for the accuracy of the network
+    """
+    init = tf.contrib.layers.variance_scaling_initializer()
+    activation = tf.nn.relu
 
-    # Initializer for the layer weights
-    initializer = tf.contrib.layers.variance_scaling_initializer()
-    layer = tf.layers.Conv2D(
-        filters=6,
-        kernel_size=5,
-        padding='same',
-        kernel_initializer=initializer,
-        activation=tf.nn.relu)  # Convolutional layer with 6 filters,
-    # kernel size 5x5, same padding, ReLU activation
-    output = layer(x)  # Apply the convolutional layer to the input
-    layer = tf.layers.MaxPooling2D(pool_size=2,
-                                   strides=2)  # Max pooling layer
-    # with pool size 2x2 and stride 2
-    output = layer(output)  # Apply the max pooling layer to the output
-    layer = tf.layers.Conv2D(filters=16,
-                             kernel_size=5,
-                             padding='valid',
-                             kernel_initializer=initializer,
-                             # Convolutional layer with 16 filters,
-                             # kernel size 5x5, valid padding, ReLU activation
-                             activation=tf.nn.relu)
-    output = layer(output)  # Apply the convolutional layer to the output
-    layer = tf.layers.MaxPooling2D(pool_size=2,
-                                   # Max pooling layer with
-                                   # pool size 2x2 and stride 2
-                                   strides=2)
-    output = layer(output)  # Apply the max pooling layer to the output
-    layer = tf.layers.Flatten()  # Flatten the output to a 1D tensor
-    output = layer(output)  # Apply the flatten layer to the output
-    layer = tf.layers.Dense(units=120,
-                            activation=tf.nn.relu,
-                            # Fully connected layer with 120 units,
-                            # ReLU activation
-                            kernel_initializer=initializer)
-    output = layer(output)  # Apply the fully connected layer to the output
-    layer = tf.layers.Dense(units=84,
-                            activation=tf.nn.relu,
-                            # Fully connected layer with 84 units,
-                            # ReLU activation
-                            kernel_initializer=initializer)
-    output = layer(output)  # Apply the fully connected layer to the output
-    layer = tf.layers.Dense(units=10,
-                            # Fully connected layer with 10 units
-                            kernel_initializer=initializer)
-    output = layer(output)  # Apply the fully connected layer to the output
+    # 1st convolutional layer
+    conv1 = tf.layers.Conv2D(filters=6, kernel_size=(5, 5), padding="same",
+                             activation=activation, kernel_initializer=init)(x)
+    pool1 = tf.layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
 
-    # Define loss as softmax cross-entropy between the
-    # true labels and unactivated output (logits)
-    loss = tf.losses.softmax_cross_entropy(y, output)
+    # 2nd convolutional layer
+    conv2 = tf.layers.Conv2D(filters=16, kernel_size=(5, 5), padding="valid",
+                             activation=activation, kernel_initializer=init)(
+        pool1)
+    pool2 = tf.layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
 
-    # Define an Adam optimizer with default learning rate & minimize the loss
-    train_op = tf.train.AdamOptimizer().minimize(loss)
+    # Flatten
+    flatten = tf.layers.Flatten()(pool2)
 
-    # Activate the output with softmax
-    y_pred = tf.nn.softmax(output)
+    # Fully connected (FC) 1
+    fc1 = tf.layers.Dense(units=120, activation=activation,
+                          kernel_initializer=init)(flatten)
+    # FC 2
+    fc2 = tf.layers.Dense(units=84, activation=activation,
+                          kernel_initializer=init)(fc1)
+    # FC 3
+    fc3 = tf.layers.Dense(units=10, activation=None,
+                          kernel_initializer=init)(fc2)
 
-    # Evaluate the accuracy of the model
-    acc = accuracy(y, y_pred)
+    # Prediction
+    y_pred = tf.nn.softmax(fc3)
 
-    return y_pred, train_op, loss, acc
+    # Loss
+    loss = tf.losses.softmax_cross_entropy(y, fc3)
 
+    # Accuracy
+    accuracy = tf.equal(tf.argmax(y, 1), tf.argmax(fc3, 1))
+    mean = tf.reduce_mean(tf.cast(accuracy, tf.float32))
 
-def accuracy(y, y_pred):
-    """evaluate the accuracy of the model"""
-    label = tf.argmax(y, axis=1)  # Get the index of the true label
-    pred = tf.argmax(y_pred, axis=1)  # Get the index of the predicted label
-    # Compute the accuracy as the mean of correct predictions
-    acc = tf.reduce_mean(tf.cast(tf.equal(label, pred), tf.float32))
-    return acc
+    # Train
+    train = tf.train.AdamOptimizer().minimize(loss)
+
+    return y_pred, train, loss, mean
