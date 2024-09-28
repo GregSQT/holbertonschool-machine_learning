@@ -2,43 +2,42 @@
 """
 Dense Block
 """
-import tensorflow.keras as K
+from tensorflow import keras as K
 
 
 def transition_layer(X, nb_filters, compression):
     """
-    function that builds a transition layer
-    as described in Densely Connected Convolutional Networks
+    Builds a transition layer as described in
+    'Densely Connected Convolutional Networks' (2016).
+
+    Parameters:
+    X : tensor
+        The output of the previous layer.
+    nb_filters : int
+        The number of filters in X.
+    compression : float
+        The compression factor for the transition layer.
+
+    Returns:
+    tensor, int
+        The output of the transition layer and the number of filters
+        within the output, respectively.
     """
+    init = K.initializers.HeNormal(seed=0)
+    compressed_filters = int(nb_filters * compression)
 
-    # Use the He normal initializer for the weights
-    initializer = K.initializers.he_normal()
+    # Batch Normalization and ReLU
+    bn = K.layers.BatchNormalization(axis=-1)(X)
+    relu = K.layers.Activation('relu')(bn)
 
-    # Apply Batch Normalization to the input X
-    l1_norm = K.layers.BatchNormalization()
-    l1_output = l1_norm(X)
+    # 1x1 Convolution
+    conv = K.layers.Conv2D(compressed_filters,
+                           (1, 1), padding='same',
+                           kernel_initializer=init)(relu)
 
-    # Apply ReLU activation to the normalized output
-    l1_activ = K.layers.Activation('relu')
-    l1_output = l1_activ(l1_output)
+    # Average Pooling
+    avg_pool = K.layers.AveragePooling2D((2, 2),
+                                         strides=(2, 2),
+                                         padding='same')(conv)
 
-    # Apply a 1x1 Convolution to reduce
-    # the number of filters with compression factor
-    l1_layer = K.layers.Conv2D(filters=int(nb_filters * compression),
-                               kernel_size=1,
-                               padding='same',
-                               kernel_initializer=initializer,
-                               activation=None)
-    l1_output = l1_layer(l1_output)
-
-    # Apply Average Pooling with pool_size=2 to reduce the spatial dimensions
-    avg_pool = K.layers.AvgPool2D(pool_size=2,
-                                  padding='same',
-                                  strides=None)
-    X = avg_pool(l1_output)
-
-    # Return the output X and the number of filters in the output
-    return X, X.shape[-1]
-    # Alternatively, you can return the number of filters using:
-    # return X, int(nb_filters*compression)
-    
+    return avg_pool, compressed_filters
