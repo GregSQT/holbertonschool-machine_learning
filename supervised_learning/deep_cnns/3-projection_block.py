@@ -2,61 +2,34 @@
 """
 Projection Block
 """
-import tensorflow.keras as K
+from tensorflow import keras as K
 
 
 def projection_block(A_prev, filters, s=2):
     """
-    function that builds a projection block
-    as described in Deep Residual Learning for Image Recognition (2015)
     """
-    initializer = K.initializers.he_normal()
+    F11, F3, F12 = filters
+    he_norm = K.initializers.he_normal(seed=0)
 
-    F11_layer = K.layers.Conv2D(filters=filters[0],
-                                kernel_size=1,
-                                padding='same',
-                                strides=s,
-                                kernel_initializer=initializer,
-                                activation=None)
-    F11_output = F11_layer(A_prev)
-    F11_norm = K.layers.BatchNormalization()
-    F11_output = F11_norm(F11_output)
-    F11_activ = K.layers.Activation('relu')
-    F11_output = F11_activ(F11_output)
+    X = K.layers.Conv2D(F11, (1, 1), strides=(s, s),
+                        padding='valid', kernel_initializer=he_norm)(A_prev)
+    X = K.layers.BatchNormalization(axis=3)(X)
+    X = K.layers.Activation('relu')(X)
 
-    F3_layer = K.layers.Conv2D(filters=filters[1],
-                               kernel_size=3,
-                               padding='same',
-                               kernel_initializer=initializer,
-                               activation=None)
-    F3_output = F3_layer(F11_output)
-    F3_norm = K.layers.BatchNormalization()
-    F3_output = F3_norm(F3_output)
-    F3_activ = K.layers.Activation('relu')
-    F3_output = F3_activ(F3_output)
+    X = K.layers.Conv2D(F3, (3, 3), padding='same',
+                        kernel_initializer=he_norm)(X)
+    X = K.layers.BatchNormalization(axis=3)(X)
+    X = K.layers.Activation('relu')(X)
 
-    F12_layer = K.layers.Conv2D(filters=filters[2],
-                                kernel_size=1,
-                                padding='same',
-                                kernel_initializer=initializer,
-                                activation=None)
-    F12_output = F12_layer(F3_output)
-    F12_norm = K.layers.BatchNormalization()
-    F12_output = F12_norm(F12_output)
+    X = K.layers.Conv2D(F12, (1, 1), kernel_initializer=he_norm)(X)
+    X = K.layers.BatchNormalization(axis=3)(X)
 
-    F12_bypass_layer = K.layers.Conv2D(filters=filters[2],
-                                       kernel_size=1,
-                                       padding='same',
-                                       strides=s,
-                                       kernel_initializer=initializer,
-                                       activation=None)
-    F12_bypass = F12_bypass_layer(A_prev)
-    bypass_norm = K.layers.BatchNormalization()
-    F12_bypass = bypass_norm(F12_bypass)
+    X_short = K.layers.Conv2D(F12, (1, 1), strides=(s, s),
+                              padding='valid',
+                              kernel_initializer=he_norm)(A_prev)
+    X_short = K.layers.BatchNormalization(axis=3)(X_short)
 
-    # add input (bypass connection) and output
-    output = K.layers.Add()([F12_output, F12_bypass])
-    # activate the combined output
-    output = K.layers.Activation('relu')(output)
+    X = K.layers.Add()([X, X_short])
+    X = K.layers.Activation('relu')(X)
 
-    return output
+    return X
