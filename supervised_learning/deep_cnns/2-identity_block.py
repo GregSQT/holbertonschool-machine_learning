@@ -3,62 +3,27 @@
 Exercice 2 : Identity Block
 """
 from tensorflow import keras as K
-inception_block = __import__('0-inception_block').inception_block
 
 
 def identity_block(A_prev, filters):
     """
-        build an identity block as described in
-        'Deep Residual Learning for Image Recognition' (2015)
-
-    :param A_prev: output from previous layer
-    :param filters: tuple or list containing
-        * F11 : number of filters in first 1x1 conv
-        * F3: number of filters in 3x3 conv
-        * F12: number of filters in second 1x1 conv
-    Each conv layer followed by batch normalization along channels axis
-    and ReLu
-    He Normal initialization
-
-    :return: activated output of the identity block
     """
-    # filters extraction
     F11, F3, F12 = filters
+    he_norm = K.initializers.he_normal(seed=0)
 
-    # initializer
-    initializer = K.initializers.HeNormal()
+    X = K.layers.Conv2D(F11, (1, 1), kernel_initializer=he_norm)(A_prev)
+    X = K.layers.BatchNormalization(axis=3)(X)
+    X = K.layers.Activation('relu')(X)
 
-    # First layer
-    conv1 = K.layers.Conv2D(F11,
-                            kernel_initializer=initializer,
-                            kernel_size=(1, 1),
-                            strides=(1, 1),
-                            padding='same')(A_prev)
-    batchN1 = K.layers.BatchNormalization(axis=3)(conv1)
-    relu1 = K.layers.Activation(activation='relu')(batchN1)
+    X = K.layers.Conv2D(F3, (3, 3), padding='same',
+                        kernel_initializer=he_norm)(X)
+    X = K.layers.BatchNormalization(axis=3)(X)
+    X = K.layers.Activation('relu')(X)
 
-    # second layer
-    conv2 = K.layers.Conv2D(F3,
-                            kernel_initializer=initializer,
-                            kernel_size=(3, 3),
-                            strides=(1, 1),
-                            padding='same')(relu1)
+    X = K.layers.Conv2D(F12, (1, 1), kernel_initializer=he_norm)(X)
+    X = K.layers.BatchNormalization(axis=3)(X)
 
-    batchN2 = K.layers.BatchNormalization(axis=3)(conv2)
-    relu2 = K.layers.Activation(activation='relu')(batchN2)
+    X = K.layers.Add()([X, A_prev])
+    X = K.layers.Activation('relu')(X)
 
-    # third layer
-    conv3 = K.layers.Conv2D(F12,
-                            kernel_size=(1, 1),
-                            kernel_initializer=initializer,
-                            strides=(1, 1),
-                            padding='same')(relu2)
-    batchN3 = K.layers.BatchNormalization(axis=3)(conv3)
-
-    # add input (Residual Network)
-    resnet = K.layers.add([batchN3, A_prev])
-
-    # last activation
-    output = K.layers.Activation(activation='relu')(resnet)
-
-    return output
+    return X
