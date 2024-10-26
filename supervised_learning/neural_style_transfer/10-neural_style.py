@@ -2,7 +2,6 @@
 """
 Neural style transfer
 """
-
 import numpy as np
 import tensorflow as tf
 
