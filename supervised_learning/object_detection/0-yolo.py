@@ -46,4 +46,3 @@ class Yolo:
         # Open the file and read class names into a list
         with open(file_path, 'r') as file:
             return [line.strip() for line in file]
-        
