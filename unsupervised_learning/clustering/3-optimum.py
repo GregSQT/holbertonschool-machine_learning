@@ -10,6 +10,7 @@ import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 variance = __import__('2-variance').variance
 
+
 # Define the 'optimum_k' function with parameters
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
