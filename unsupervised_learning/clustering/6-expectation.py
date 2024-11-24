@@ -9,7 +9,6 @@ import numpy as np
 # Import the pdf function from the 5-pdf module
 pdf = __import__('5-pdf').pdf
 
-
 def expectation(X, pi, m, S):
     """
     Calculates the expectation step in the EM algorithm
