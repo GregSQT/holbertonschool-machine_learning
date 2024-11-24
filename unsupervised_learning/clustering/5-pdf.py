@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-6-pdf - a function def pdf(X, m, S): that calculates the probability
+5-pdf - a function def pdf(X, m, S): that calculates the probability
 density function of a Gaussian distribution
 """
 
