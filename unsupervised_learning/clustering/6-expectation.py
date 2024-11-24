@@ -1,84 +1,55 @@
 #!/usr/bin/env python3
 """
-6-expectation - a function def expectation(X, pi, m, S): that calculates
-the expectation step in the EM algorithm for a GMM
+Expectation step, EM algorithm with GMM
 """
+
 import numpy as np
-
-
-# Import the pdf function from the 5-pdf module
 pdf = __import__('5-pdf').pdf
+
 
 def expectation(X, pi, m, S):
     """
-    Calculates the expectation step in the EM algorithm
-    for a Gaussian Mixture Model (GMM).
+    Calculates the expectation step in the EM algorithm for a GMM.
 
-    Args:
-        X (numpy.ndarray): Data points of shape (n_samples, n_features).
-        pi (numpy.ndarray): Priors for each cluster of shape (k,).
-        m (numpy.ndarray): Centroid means for each
-        cluster of shape (k, n_features).
-        S (numpy.ndarray): Covariance matrices for each
-        cluster of shape (k, n_features, n_features).
+    Parameters:
+    - X (numpy.ndarray): 2D numpy array of shape (n, d) containing the data set
+    - pi (numpy.ndarray): 1D numpy array of shape (k,) containing the priors
+    for each cluster.
+    - m (numpy.ndarray): 2D numpy array of shape (k, d) containing the centroid
+    means for each cluster.
+    - S (numpy.ndarray): 3D numpy array of shape (k, d, d) containing the
+    covariance matrices for each cluster.
 
     Returns:
-        Tuple[numpy.ndarray, float]:
-        - posterior_probs (numpy.ndarray):
-        Posterior probabilities for each data point
-        in each cluster of shape (k, n_samples).
-        - total_log_likelihood (float): Total log likelihood.
-        Returns (None, None) on failure.
+    - post_probs (numpy.ndarray): 2D numpy array of shape (k, n) containing the
+    posterior probabilities for each data point in each cluster.
+    - log_likelihood (float): The total log likelihood.
     """
-    # Check if X is a 2D numpy array
-    if not isinstance(X, np.ndarray) or X.ndim != 2:
+    if (not isinstance(X, np.ndarray) or X.ndim != 2 or
+            not isinstance(pi, np.ndarray) or pi.ndim != 1 or
+            not isinstance(m, np.ndarray) or m.ndim != 2 or
+            not isinstance(S, np.ndarray) or S.ndim != 3 or
+            X.shape[1] != m.shape[1] or m.shape[0] != S.shape[0] or
+            S.shape[1] != S.shape[2] or
+            pi.shape[0] != m.shape[0] or pi.shape[0] != S.shape[0]):
         return None, None
 
-    # Check if pi is a 1D numpy array
-    if not isinstance(pi, np.ndarray) or pi.ndim != 1:
-        return None, None
-
-    # Check if m is a 2D numpy array
-    if not isinstance(m, np.ndarray) or m.ndim != 2:
-        return None, None
-
-    # Check if S is a 3D numpy array
-    if not isinstance(S, np.ndarray) or S.ndim != 3:
-        return None, None
-
-    num_samples, num_features = X.shape
-
-    # Check if the number of clusters is greater than the number of samples
-    if pi.shape[0] > num_samples:
-        return None, None
-
-    num_clusters = pi.shape[0]
-
-    # Check if the dimensions of m and S match the number of features and clusters
-    if m.shape[0] != num_clusters or m.shape[1] != num_features:
-        return None, None
-
-    if S.shape[0] != num_clusters or S.shape[1] != \
-    num_features or S.shape[2] != num_features:
-        return None, None
-
-    # Check if the sum of priors is close to 1
     if not np.isclose([np.sum(pi)], [1])[0]:
         return None, None
 
-    # Initialize an array for posterior probabilities
-    posterior_probs = np.zeros((num_clusters, num_samples))
+    k = pi.shape[0]
 
-    # Calculate posterior probabilities for each cluster
-    for i in range(num_clusters):
-        PDF = pdf(X, m[i], S[i])
-        posterior_probs[i] = pi[i] * PDF
+    # Build array of PDF values w/ each cluster
+    pdfs = np.array([pdf(X, m[i], S[i]) for i in range(k)])
 
-    # Normalize posterior probabilities
-    sum_posterior_probs = np.sum(posterior_probs, axis=0, keepdims=True)
-    posterior_probs /= sum_posterior_probs
+    # Calculate the weighted PDFs
+    weighted_pdfs = pi[:, np.newaxis] * pdfs
 
-    # Calculate total log likelihood
-    total_log_likelihood = np.sum(np.log(sum_posterior_probs))
+    # Normalize posterior probabilities by marginal probabilities
+    marginal_prob = np.sum(weighted_pdfs, axis=0)
+    post_probs = weighted_pdfs / marginal_prob
 
-    return posterior_probs, total_log_likelihood
+    # Calc. the log likelihood(sum of logs of all marginal probs)
+    log_likelihood = np.sum(np.log(marginal_prob))
+
+    return post_probs, log_likelihood
