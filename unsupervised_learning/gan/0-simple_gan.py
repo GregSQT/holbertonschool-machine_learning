@@ -30,7 +30,7 @@ class Simple_GAN(keras.Model):
         self.generator.compile(optimizer=generator.optimizer,
                                loss=generator.loss)
 
-         # Discriminator loss and optimizer
+        # Discriminator loss and optimizer
         self.discriminator.loss = lambda x, y: (
                 tf.keras.losses.MeanSquaredError()(x, tf.ones(x.shape)) +
                 tf.keras.losses.MeanSquaredError()(y, -1*tf.ones(y.shape)))
@@ -67,10 +67,10 @@ class Simple_GAN(keras.Model):
 
                 discr_loss = self.discriminator.loss(real_output, fake_output)
 
-            discr_grads = tape.gradient(discr_loss, 
+            discr_grads = tape.gradient(discr_loss,
                                         self.discriminator.trainable_variables)
-            self.discriminator.optimizer.apply_gradients\
-                (zip(discr_grads, self.discriminator.trainable_variables))
+            self.discriminator.optimizer.apply_gradients(zip(discr_grads,
+                                        self.discriminator.trainable_variables))
 
         with tf.GradientTape() as tape:
             fake_samples = self.get_fake_sample(training=True)
@@ -78,7 +78,7 @@ class Simple_GAN(keras.Model):
             gen_loss = self.generator.loss(gen_output)
 
         gen_grads = tape.gradient(gen_loss, self.generator.trainable_variables)
-        self.generator.optimizer.apply_gradients\
-            (zip(gen_grads, self.generator.trainable_variables))
+        self.generator.optimizer.apply_gradients(zip(gen_grads,
+                                        self.generator.trainable_variables))
 
         return {"discr_loss": discr_loss, "gen_loss": gen_loss}
