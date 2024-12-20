@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # simple_gan.py
+
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -7,7 +8,7 @@ import numpy as np
 
 # creation of the simple_GAN class
 class Simple_GAN(keras.Model):
-
+    # Init
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, batch_size=200, disc_iter=2,
                  learning_rate=.005):
