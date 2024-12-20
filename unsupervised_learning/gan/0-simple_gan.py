@@ -7,7 +7,8 @@ import numpy as np
 
 class Simple_GAN(keras.Model):
 
-    def __init__(self, generator, discriminator, latent_generator, real_examples, batch_size=200, disc_iter=2, learning_rate=.005):
+    def __init__(self, generator, discriminator, latent_generator, real_examples,
+                 batch_size=200, disc_iter=2, learning_rate=.005):
         super().__init__()  # Initialize Keras.Model
         self.latent_generator = latent_generator
         self.real_examples = real_examples
@@ -21,13 +22,15 @@ class Simple_GAN(keras.Model):
 
         # Generator loss and optimizer
         self.generator.loss = lambda x: tf.keras.losses.MeanSquaredError()(x, tf.ones(x.shape))
-        self.generator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
+        self.generator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate,
+                                                         beta_1=self.beta_1, beta_2=self.beta_2)
         self.generator.compile(optimizer=generator.optimizer, loss=generator.loss)
         
         # Discriminator loss and optimizer
         self.discriminator.loss = lambda x, y: tf.keras.losses.MeanSquaredError()(x, tf.ones(x.shape)) + \
                                                 tf.keras.losses.MeanSquaredError()(y, -1*tf.ones(y.shape))
-        self.discriminator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
+        self.discriminator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate,
+                                                             beta_1=self.beta_1, beta_2=self.beta_2)
         self.discriminator.compile(optimizer=discriminator.optimizer, loss=discriminator.loss)
 
     # Generate real samples
@@ -57,7 +60,8 @@ class Simple_GAN(keras.Model):
                 discr_loss = self.discriminator.loss(real_output, fake_output)
 
             discr_grads = tape.gradient(discr_loss, self.discriminator.trainable_variables)
-            self.discriminator.optimizer.apply_gradients(zip(discr_grads, self.discriminator.trainable_variables))
+            self.discriminator.optimizer.apply_gradients(zip(discr_grads,
+                                                             self.discriminator.trainable_variables))
 
         with tf.GradientTape() as tape:
             fake_samples = self.get_fake_sample(training=True)
