@@ -5,6 +5,7 @@ from tensorflow import keras
 import numpy as np
 
 
+# creation of the simple_GAN class
 class Simple_GAN(keras.Model):
 
     def __init__(self, generator, discriminator, latent_generator,
@@ -73,6 +74,7 @@ class Simple_GAN(keras.Model):
                 apply_gradients(zip(discr_grads,
                                     self.discriminator.trainable_variables))
 
+        # Boucle while
         with tf.GradientTape() as tape:
             fake_samples = self.get_fake_sample(training=True)
             gen_output = self.discriminator(fake_samples, training=False)
@@ -82,4 +84,5 @@ class Simple_GAN(keras.Model):
         self.generator.optimizer.\
             apply_gradients(zip(gen_grads, self.generator.trainable_variables))
 
+        # return
         return {"discr_loss": discr_loss, "gen_loss": gen_loss}
