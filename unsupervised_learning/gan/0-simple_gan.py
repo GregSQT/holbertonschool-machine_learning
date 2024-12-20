@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # simple_gan.py
-#Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel 
+# Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
 # nisi non justo accumsan auctor. Maecenas molestie orci a erat
 # faucibus tempus. Quisque quis odio nibh. Sed ac turpis ante.
 # Duis sit amet feugiat massa, non maximus augue. Phasellus bibendum
 # ultrices lacinia. In auctor risus at faucibus ultrices. Aenean convallis
-# sit amet ipsum a commodo. Integer pulvinar maximus lorem et volutpat. 
-# estibulum orci libero, sagittis in pulvinar iaculis, volutpat eu arcu. 
+# sit amet ipsum a commodo. Integer pulvinar maximus lorem et volutpat.
+# estibulum orci libero, sagittis in pulvinar iaculis, volutpat eu arcu.
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
