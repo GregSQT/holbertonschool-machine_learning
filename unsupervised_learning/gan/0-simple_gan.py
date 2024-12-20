@@ -13,6 +13,7 @@ import numpy as np
 
 
 # creation of the simple_GAN class
+# Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
 class Simple_GAN(keras.Model):
     # Init
     def __init__(self, generator, discriminator, latent_generator,
@@ -30,6 +31,7 @@ class Simple_GAN(keras.Model):
         self.beta_2 = .9
 
         # Generator loss and optimizer
+        # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
         self.generator.loss = lambda x: \
             tf.keras.losses.MeanSquaredError()(x, tf.ones(x.shape))
         self.generator.optimizer = \
@@ -39,6 +41,7 @@ class Simple_GAN(keras.Model):
                                loss=generator.loss)
 
         # Discriminator loss and optimizer
+        # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
         self.discriminator.loss = lambda x, y: (
                 tf.keras.losses.MeanSquaredError()(x, tf.ones(x.shape)) +
                 tf.keras.losses.MeanSquaredError()(y, -1*tf.ones(y.shape)))
@@ -50,6 +53,7 @@ class Simple_GAN(keras.Model):
                                    loss=discriminator.loss)
 
     # Generate real samples
+    # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
     def get_real_sample(self, size=None):
         if not size:
             size = self.batch_size
@@ -58,12 +62,14 @@ class Simple_GAN(keras.Model):
         return tf.gather(self.real_examples, random_indices)
 
     # Generate fake samples
+    # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
     def get_fake_sample(self, size=None, training=False):
         if not size:
             size = self.batch_size
         return self.generator(self.latent_generator(size), training=training)
 
     # Perform one training step
+    # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
     def train_step(self, useless_argument):
         for _ in range(self.disc_iter):
             with tf.GradientTape() as tape:
@@ -82,6 +88,7 @@ class Simple_GAN(keras.Model):
                                     self.discriminator.trainable_variables))
 
         # Boucle while
+        # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
         with tf.GradientTape() as tape:
             fake_samples = self.get_fake_sample(training=True)
             gen_output = self.discriminator(fake_samples, training=False)
@@ -92,4 +99,5 @@ class Simple_GAN(keras.Model):
             apply_gradients(zip(gen_grads, self.generator.trainable_variables))
 
         # return
+        # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel
         return {"discr_loss": discr_loss, "gen_loss": gen_loss}
