@@ -196,4 +196,3 @@ class WGAN_GP(keras.Model):
         """
         self.generator.load_weights(gen_h5)
         self.discriminator.load_weights(disc_h5)
-        
