@@ -33,7 +33,7 @@ class SelfAttention(tf.keras.layers.Layer):
         containing the outputs of the encoder
         Returns: context, weights"""
         s_prev_expanded = tf.expand_dims(s_prev, 1)
-        score = self.V(tf.nn.tanh(self.W(s_prev_expanded) + 
+        score = self.V(tf.nn.tanh(self.W(s_prev_expanded) +
                                   self.U(hidden_states)))
         weights = tf.nn.softmax(score, axis=1)
         context = tf.reduce_sum(weights * hidden_states, axis=1)
