@@ -7,7 +7,8 @@ The trained policy is saved as 'policy.h5'.
 
 import gymnasium as gym
 import numpy as np
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import load_model
+model = load_model('pD:\Dropbox\Informatique\Holberton\holbertonschool-machine_learning\reinforcement_learning\deep_q_learning\policy.h5')
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Permute
 from tensorflow.keras.optimizers.legacy import Adam  # Using legacy Adam optimizer for keras-rl2 compatibility
 from rl.agents.dqn import DQNAgent
