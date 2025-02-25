@@ -8,7 +8,7 @@ The trained policy is saved as 'policy.h5'.
 import gymnasium as gym
 import numpy as np
 from tensorflow.keras.models import load_model
-model = load_model('pD:\Dropbox\Informatique\Holberton\holbertonschool-machine_learning\reinforcement_learning\deep_q_learning\policy.h5')
+model = load_model(r'D:\Dropbox\Informatique\Holberton\holbertonschool-machine_learning\reinforcement_learning\deep_q_learning\policy.h5')
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Permute
 from tensorflow.keras.optimizers.legacy import Adam  # Using legacy Adam optimizer for keras-rl2 compatibility
 from rl.agents.dqn import DQNAgent
@@ -26,9 +26,8 @@ class CompatibilityWrapper(gym.Wrapper):
     def step(self, action):
         """
         Takes a step in the environment with the given action.
-
-        :param action: The action to take in the environment.
-        :return: Tuple of (observation, reward, done, info)
+            param action: The action to take in the environment.
+            return: Tuple of (observation, reward, done, info)
                  - observation: the resulting observation
                  - reward: the reward received from this step
                  - done: whether the episode has terminated
@@ -41,9 +40,8 @@ class CompatibilityWrapper(gym.Wrapper):
     def reset(self, **kwargs):
         """
         Resets the environment and returns the initial observation.
-
-        :param kwargs: additional arguments for resetting the environment
-        :return: initial observation
+            param kwargs: additional arguments for resetting the environment
+            return: initial observation
         """
         observation, info = self.env.reset(**kwargs)
         return observation
@@ -51,9 +49,8 @@ class CompatibilityWrapper(gym.Wrapper):
 def create_atari_environment(env_name):
     """
     Initializes and configures an Atari environment for training.
-
-    :param env_name: str, the name of the Atari environment to initialize
-    :return: gym.Env object configured for Atari gameplay
+        param env_name: str, the name of the Atari environment to initialize
+        return: gym.Env object configured for Atari gameplay
     """
     env = gym.make(env_name, render_mode='rgb_array')
     env = gym.wrappers.AtariPreprocessing(env, screen_size=84, grayscale_obs=True, frame_skip=1, noop_max=30)
@@ -64,11 +61,10 @@ def create_atari_environment(env_name):
 def build_model(window_length, shape, actions):
     """
     Constructs a Convolutional Neural Network (CNN) model for DQN learning.
-
-    :param window_length: int, number of frames stacked together as input to represent motion
-    :param shape: tuple, the shape of individual frames (height, width, channels)
-    :param actions: int, the number of possible actions in the environment
-    :return: Sequential keras model ready for DQN training
+        param window_length: int, number of frames stacked together as input to represent motion
+        param shape: tuple, the shape of individual frames (height, width, channels)
+        param actions: int, the number of possible actions in the environment
+        return: Sequential keras model ready for DQN training
     """
     model = Sequential()
     # Reorder input dimensions to fit keras-rl2 requirements
