@@ -1,120 +1,95 @@
 #!/usr/bin/env python3
-"""
-train.py
-Trains a Deep Q-Network (DQN) agent on Atari's Breakout using keras-rl2 and Gymnasium.
-The trained policy is saved as 'policy.h5'.
-"""
-
-import gymnasium as gym
+"""train an agent that can play Atari's Breakout"""
+from PIL import Image
 import numpy as np
-from tensorflow.keras.models import load_model
-model = load_model(r'D:\Dropbox\Informatique\Holberton\holbertonschool-machine_learning\reinforcement_learning\deep_q_learning\policy.h5')
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Permute
-from tensorflow.keras.optimizers.legacy import Adam  # Using legacy Adam optimizer for keras-rl2 compatibility
+import gymnasium as gym
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
+from keras.optimizers import Adam
 from rl.agents.dqn import DQNAgent
+from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
 from rl.memory import SequentialMemory
-from rl.policy import EpsGreedyQPolicy
+from rl.core import Processor
 
-
+# Compatibility wrapper for Gymnasium
 class CompatibilityWrapper(gym.Wrapper):
-    """
-    A wrapper to adjust the environment for compatibility with keras-rl2.
-    Ensures the environment returns the expected outputs and handles episode
-    termination flags as required by keras-rl2.
-    """
-
     def step(self, action):
-        """
-        Takes a step in the environment with the given action.
-            param action: The action to take in the environment.
-            return: Tuple of (observation, reward, done, info)
-                 - observation: the resulting observation
-                 - reward: the reward received from this step
-                 - done: whether the episode has terminated
-                 - info: additional information about the step
-        """
+        # Gymnasium returns: observation, reward, terminated, truncated, info
         observation, reward, terminated, truncated, info = self.env.step(action)
         done = terminated or truncated
         return observation, reward, done, info
 
     def reset(self, **kwargs):
-        """
-        Resets the environment and returns the initial observation.
-            param kwargs: additional arguments for resetting the environment
-            return: initial observation
-        """
         observation, info = self.env.reset(**kwargs)
         return observation
 
-def create_atari_environment(env_name):
-    """
-    Initializes and configures an Atari environment for training.
-        param env_name: str, the name of the Atari environment to initialize
-        return: gym.Env object configured for Atari gameplay
-    """
-    env = gym.make(env_name, render_mode='rgb_array')
-    env = gym.wrappers.AtariPreprocessing(env, screen_size=84, grayscale_obs=True, frame_skip=1, noop_max=30)
-    env = CompatibilityWrapper(env)
-    return env
+class AtariProcessor(Processor):
+    """Atari preprocessor"""
+    def process_observation(self, observation):
+        """process observation"""
+        # If observation is a tuple (observation, info), extract the observation
+        if isinstance(observation, tuple):
+            observation = observation[0]
+        # Ensure the observation is 3-dimensional (height, width, channels)
+        assert observation.ndim == 3, f"Expected observation.ndim == 3, got {observation.ndim}"
+        img = Image.fromarray(observation)
+        img = img.resize((84, 84)).convert('L')
+        processed_observation = np.array(img)
+        assert processed_observation.shape == (84, 84), f"Processed shape mismatch: {processed_observation.shape}"
+        return processed_observation.astype('uint8')
 
+    def process_state_batch(self, batch):
+        """process state batch"""
+        processed_batch = batch.astype('float32') / 255.
+        return processed_batch
 
-def build_model(window_length, shape, actions):
-    """
-    Constructs a Convolutional Neural Network (CNN) model for DQN learning.
-        param window_length: int, number of frames stacked together as input to represent motion
-        param shape: tuple, the shape of individual frames (height, width, channels)
-        param actions: int, the number of possible actions in the environment
-        return: Sequential keras model ready for DQN training
-    """
+    def process_reward(self, reward):
+        """process reward"""
+        return np.clip(reward, -1., 1.)
+
+def build_model(num_action):
+    """build model"""
+    input_shape = (4, 84, 84)
     model = Sequential()
-    # Reorder input dimensions to fit keras-rl2 requirements
-    model.add(Permute((2, 3, 1), input_shape=(window_length,) + shape))
-    # First convolutional layer to capture spatial patterns
-    model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu'))
-    # Second convolutional layer for deeper pattern recognition
-    model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu'))
-    # Third convolutional layer to refine spatial features
-    model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu'))
-    # Flatten the feature maps into a single vector
+    model.add(Permute((2, 3, 1), input_shape=input_shape))
+    model.add(Convolution2D(32, (8, 8), strides=(4, 4)))
+    model.add(Activation('relu'))
+    model.add(Convolution2D(64, (4, 4), strides=(2, 2)))
+    model.add(Activation('relu'))
+    model.add(Convolution2D(64, (3, 3), strides=(1, 1)))
+    model.add(Activation('relu'))
     model.add(Flatten())
-    # Fully connected layer to process combined features
-    model.add(Dense(512, activation='relu'))
-    # Output layer with linear activation to predict Q-values for each action
-    model.add(Dense(actions, activation='linear'))
-    return model
+    model.add(Dense(512))
+    model.add(Activation('relu'))
+    model.add(Dense(num_action))
+    model.add(Activation('linear'))
+    return model  # Return the built model
 
-# DQN Agent Setup
+if __name__ == '__main__':
+    env = gym.make("Breakout-v0")
+    env = CompatibilityWrapper(env)  # Wrap the env to match the expected API (4 values)
+    env.reset()
+    num_action = env.action_space.n
+    window = 4
+    model = build_model(num_action)
+    model.summary()
+    memory = SequentialMemory(limit=1000000, window_length=window)
+    processor = AtariProcessor()
+    policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps',
+                                  value_max=1., value_min=.1, value_test=.05,
+                                  nb_steps=1000000)
 
-if __name__ == "__main__":
-    # Initialize the environment
-    env = create_atari_environment('ALE/Breakout-v5')
-    nb_actions = env.action_space.n  # Number of possible actions in Breakout
+    dqn = DQNAgent(model=model, nb_actions=num_action, policy=policy,
+                   memory=memory, processor=processor,
+                   nb_steps_warmup=50000, gamma=.99,
+                   target_model_update=10000,
+                   train_interval=4,
+                   delta_clip=1.)
+    dqn.compile(Adam(lr=.00025), metrics=['mae'])
+    dqn.fit(env,
+            nb_steps=17500,
+            log_interval=10000,
+            visualize=False,
+            verbose=2)
 
-    # Build and configure the model
-    window_length = 4  # Number of consecutive frames to form an observation
-    model = build_model(window_length, env.observation_space.shape, nb_actions)
-
-    # Define the DQN agent with a policy and memory buffer
-    memory = SequentialMemory(limit=1000000, window_length=window_length)  # Replay buffer to store past experiences
-    policy = EpsGreedyQPolicy()  # Epsilon-greedy policy for exploration-exploitation balance
-    dqn = DQNAgent(
-        model=model,
-        nb_actions=nb_actions,
-        policy=policy,
-        memory=memory,
-        nb_steps_warmup=50000,  # Steps before training begins to populate memory
-        gamma=0.99,  # Discount factor for future rewards
-        target_model_update=10000,  # Interval for updating target network weights
-        train_interval=4,  # Frequency of training updates
-        delta_clip=1.0  # Clip error term for stability
-    )
-    dqn.compile(Adam(learning_rate=0.00025), metrics=['mae'])
-
-    # Train the DQN agent on the environment
-    dqn.fit(env, nb_steps=1000000, visualize=False, verbose=2)
-
-    # Save the trained model weights
     dqn.save_weights('policy.h5', overwrite=True)
-
-    # Close the environment to free resources
-    env.close()
