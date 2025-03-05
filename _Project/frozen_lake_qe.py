@@ -83,4 +83,4 @@ def run(episodes, is_training=True, render=False):
 
 if __name__ == '__main__':
 
-    run(15000, is_training=True, render=True)
+    run(1000, is_training=True, render=True)

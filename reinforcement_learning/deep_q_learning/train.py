@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Entraîne un agent pour jouer à Breakout (Atari)"""
+"""Train an agent to play Breakout (Atari)"""
 
 from PIL import Image
 import numpy as np
 import gymnasium as gym
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten, Conv2D, Permute
-# Utilisation de l'optimiseur legacy pour éviter l'erreur get_updates
+# Usage of the legacy optimizer to avoid the get_updates error
 from tensorflow.keras.optimizers.legacy import Adam
 from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
@@ -18,10 +18,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.filterwarnings("ignore")
 
 
-# Wrapper de compatibilité pour Gymnasium
+# Compatibility wrapper for Gymnasium
 class CompatibilityWrapper(gym.Wrapper):
     def step(self, action):
-        # Gymnasium renvoie : observation, reward, terminated, truncated, info
+        # Gymnasium returns: observation, reward, terminated, truncated, info
         observation, reward, terminated, truncated, info = self.env.step(action)
         done = terminated or truncated
         return observation, reward, done, info
@@ -30,16 +30,16 @@ class CompatibilityWrapper(gym.Wrapper):
         observation, info = self.env.reset(**kwargs)
         return observation
 
-# Préprocesseur pour Atari
+# Preprocessing for Atari
 class AtariProcessor(Processor):
     def process_observation(self, observation):
-        # Si observation est un tuple (observation, info), on extrait l'observation
+        # If the observation is a tuple (observation, info), extract the observation
         if isinstance(observation, tuple):
             observation = observation[0]
-        # On s'assure que l'observation est en 3 dimensions (hauteur, largeur, canaux)
+        # We assume the observation is in 3 dimensions (height, width, channel)
         assert observation.ndim == 3, f"Expected observation.ndim == 3, got {observation.ndim}"
         img = Image.fromarray(observation)
-        # Redimensionnement à 84x84 et conversion en niveaux de gris
+        # Resizing to 84x84 and converting to grayscale
         img = img.resize((84, 84)).convert('L')
         processed_observation = np.array(img)
         assert processed_observation.shape == (84, 84), f"Processed shape mismatch: {processed_observation.shape}"
@@ -52,7 +52,7 @@ class AtariProcessor(Processor):
         return np.clip(reward, -1., 1.)
 
 def build_model(num_actions):
-    """Construit le modèle de réseau de neurones."""
+    """Construct the neural network model."""
     input_shape = (4, 84, 84)
     model = Sequential()
     model.add(Permute((2, 3, 1), input_shape=input_shape))
@@ -65,7 +65,7 @@ def build_model(num_actions):
     return model
 
 if __name__ == '__main__':
-    # Création de l'environnement avec render_mode="human" pour l'affichage
+    # Create the environment with render_mode="human" for display
     env = gym.make("Breakout-v4", render_mode="human")
     env = CompatibilityWrapper(env)
     env.reset()
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         nb_steps=1000000
     )
 
-    # IMPORTANT : On réduit le nb_steps_warmup à 1000 pour que l'agent commence à apprendre
+    # IMPORTANT: Reduce nb_steps_warmup to 1000 so that the agent starts learning
     dqn = DQNAgent(
         model=model,
         nb_actions=num_actions,
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     )
     dqn.compile(Adam(lr=0.00025), metrics=['mae'])
     
-    # Entraînement sur 17 500 étapes (attention : pour Breakout, il faut généralement des millions d'étapes)
+    # Training for 17,500 steps (warning: for Breakout, you generally need millions of steps)
     dqn.fit(env,
             nb_steps=1000000,
             log_interval=1000,
