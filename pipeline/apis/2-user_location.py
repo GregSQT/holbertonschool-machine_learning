@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Uses the GitHub API to print the location of a specific user,
-where user is passed as first argument of the script with full API URL
+where user is passed as first argument of the script with full API URL.
 """
 
 import requests
