@@ -1,44 +1,76 @@
 #!/usr/bin/env python3
 """
-Fetch and display the first SpaceX launch details in the required format.
+Uses the (unofficial) SpaceX API to print the upcoming launch
 """
 
 import requests
 
 
-def main():
+def get_rocket_name(rocket_id):
     """
-    Fetch and display the first SpaceX launch details in the required format.
+    Retrieve the name of the rocket using its ID.
+
+    Args:
+        rocket_id (str): The ID of the rocket.
+
+    Returns:
+        str: The name of the rocket.
     """
-    # Fetch all launches
-    response = requests.get('https://api.spacexdata.com/v4/launches/upcoming')
-    launches = response.json()
-
-    # Find the first upcoming launch based on date_unix
-    first_launch = min(launches, key=lambda x: x['date_unix'])
-
-    # Extract relevant information from the launch
-    launch_name = first_launch['name']
-    date_local = first_launch['date_local']
-    rocket_id = first_launch['rocket']
-    launchpad_id = first_launch['launchpad']
-
-    # Fetch rocket information
-    rocket_response = requests.get(
-            f'https://api.spacexdata.com/v4/rockets/{rocket_id}')
-    rocket_name = rocket_response.json()['name']
-
-    # Fetch launchpad information
-    launchpad_response = requests.get(
-            f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}')
-    launchpad_data = launchpad_response.json()
-    launchpad_name = launchpad_data['name']
-    launchpad_locality = launchpad_data['locality']
-
-    # Print the formatted information
-    print(f"{launch_name} ({date_local}) {rocket_name} - {launchpad_name}"
-          f" ({launchpad_locality})")
+    rocket_url = f"https://api.spacexdata.com/v4/rockets/{rocket_id}"
+    response = requests.get(rocket_url)
+    if response.status_code == 200:
+        rocket_data = response.json()
+        return rocket_data.get('name', 'Unknown')
+    return 'Unknown'
 
 
-if __name__ == "__main__":
-    main()
+def get_first_launch():
+    """
+    Retrieve and display information about the first SpaceX launch.
+
+    Returns:
+        str: A formatted string with the launch details.
+    """
+    url = "https://api.spacexdata.com/v4/launches/upcoming"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        launches = response.json()
+
+        # Sort launches by date_unix
+        launches_sorted = sorted(launches, key=lambda x: x['date_unix'])
+
+        # Get the first launch in the sorted list
+        first_launch = launches_sorted[0]
+
+        # Extract necessary information
+        launch_name = first_launch.get('name', 'Unknown')
+        date = first_launch.get('date_local', 'Unknown')
+        rocket_id = first_launch.get('rocket', 'Unknown')
+        launchpad_id = first_launch.get('launchpad', 'Unknown')
+
+        # Fetch rocket name using the rocket ID
+        rocket_name = get_rocket_name(rocket_id)
+
+        # Fetch launchpad details using the launchpad ID
+        launchpad_url = (
+            f"https://api.spacexdata.com/v4/launchpads/{launchpad_id}")
+        launchpad_response = requests.get(launchpad_url)
+        if launchpad_response.status_code == 200:
+            launchpad_data = launchpad_response.json()
+            launchpad_name = launchpad_data.get('name', 'Unknown')
+            launchpad_locality = launchpad_data.get('locality', 'Unknown')
+        else:
+            launchpad_name = 'Unknown'
+            launchpad_locality = 'Unknown'
+
+        # Format the output
+        return (f"{launch_name} ({date}) {rocket_name} - "
+                f"{launchpad_name} ({launchpad_locality})")
+    else:
+        return "Failed to retrieve launch data."
+
+
+if __name__ == '__main__':
+    launch_info = get_first_launch()
+    print(launch_info)

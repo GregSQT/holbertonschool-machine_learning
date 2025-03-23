@@ -1,60 +1,63 @@
 #!/usr/bin/env python3
 """
-Script to display the number of launches per rocket using the SpaceX API.
+Script to fetch and display the number of SpaceX launches per rocket.
 """
 
 import requests
-from collections import defaultdict
 
 
-def main():
+def get_rocket_name(rocket_id):
     """
-    Fetch and display the number of launches per rocket in descending order.
+    Retrieve the name of the rocket using its ID.
+
+    Args:
+        rocket_id (str): The ID of the rocket.
+
+    Returns:
+        str: The name of the rocket.
     """
-    launches_url = "https://api.spacexdata.com/v4/launches"
-    rockets_url = "https://api.spacexdata.com/v4/rockets"
+    rocket_url = f"https://api.spacexdata.com/v4/rockets/{rocket_id}"
+    response = requests.get(rocket_url)
+    if response.status_code == 200:
+        rocket_data = response.json()
+        return rocket_data.get('name', 'Unknown')
+    return 'Unknown'
 
-    try:
-        # Fetch launches data
-        launches_response = requests.get(launches_url)
-        if launches_response.status_code != 200:
-            print("Error fetching launches")
-            return
-        launches = launches_response.json()
 
-        # Count launches per rocket ID
-        rocket_launch_count = defaultdict(int)
+def get_launches_per_rocket():
+    """
+    Retrieve and display the number of launches per rocket.
+
+    Returns:
+        None
+    """
+    url = "https://api.spacexdata.com/v4/launches"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        launches = response.json()
+
+        # Dictionary to count launches per rocket
+        rocket_count = {}
+
         for launch in launches:
-            rocket_launch_count[launch["rocket"]] += 1
+            rocket_id = launch['rocket']
+            rocket_name = get_rocket_name(rocket_id)
+            if rocket_name in rocket_count:
+                rocket_count[rocket_name] += 1
+            else:
+                rocket_count[rocket_name] = 1
 
-        # Fetch rocket data
-        rockets_response = requests.get(rockets_url)
-        if rockets_response.status_code != 200:
-            print("Error fetching rockets")
-            return
-        rockets = rockets_response.json()
+        # Sort the results by number of launches and rocket name
+        sorted_rockets = sorted(
+            rocket_count.items(), key=lambda x: (-x[1], x[0]))
 
-        # Create a dictionary to map rocket IDs to their names
-        rocket_names = {rocket["id"]: rocket["name"] for rocket in rockets}
-
-        # Create a list of tuples with rocket names and their launch counts
-        rocket_data = [
-                (rocket_names[rocket_id], count)
-                for rocket_id, count in rocket_launch_count.items()
-                if rocket_id in rocket_names
-                ]
-
-        # Sort the list by number of launches (descending) and then
-        # alphabetically by name
-        rocket_data.sort(key=lambda x: (-x[1], x[0]))
-
-        # Print the results
-        for name, count in rocket_data:
-            print(f"{name}: {count}")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
+        # Display the results
+        for rocket, count in sorted_rockets:
+            print(f"{rocket}: {count}")
+    else:
+        print("Failed to retrieve launch data.")
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    get_launches_per_rocket()
