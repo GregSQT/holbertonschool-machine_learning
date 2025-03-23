@@ -33,4 +33,4 @@ def sentientPlanets():
                     else:
                         planets.add("unknown")
         base_url = data.get("next")  # Get the next page URL
-    return sorted (planets)  # Return sorted list for consistent results
+    return sorted(planets)  # Return sorted list for consistent results
